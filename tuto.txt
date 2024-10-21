@@ -1,0 +1,15 @@
+1. cmd: npm create vite@latest
+- project name: "." (ignore files and continue)
+- React
+- Typescript
+
+2. cmd: npm install
+
+3. cmd: npm i -S react-router-dom | npm i -D @types/react-router-dom
+
+4. caution:
+- run the dev server: cmd => npm run dev
+- run the prod server: cmd => npm run build
+
+5. add BE's proxy:
+- package.json: 

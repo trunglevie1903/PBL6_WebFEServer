@@ -1,0 +1,34 @@
+- Hoàn thiện trang xem video:
+  + Upload date [DONE]
+  + Creator card: avatar + username [DONE]
+  + Liked, disliked: 
+    ++ need to complete BE functions and links to FE 
+      +++ functions for personal action: like, dislike, check if liked every time load the video watch page [DONE]
+      +++ functions about statistic:
+        ++++ check video's like count, dislike count [DONE]
+        ++++ auto-update every 5 mins [build later (node-cron for automation)]
+  + Comment section: need to complete BE functions and links to FE
+    ++ [CRITICAL] add column "hasChildComment" to DB table.
+    ++ each comment in UI have it texts, a "Reply" button, and a "Show replies" if this comment has child comments. [Basic UI done]
+      +++ When load the page, send request to BE to get all direct comments of this video. If there is, BE not only need to return all direct comments, but also an information for FE to know if this comments has child comments or not.
+        ++++ FE send request to BE [DONE]
+        ++++ BE return response to FE [DONE]
+        ++++ FE process the response's data
+    ++ when load the video watch page, only the direct comments to the video is loaded. [Basic UI done]
+    ++ only when user clicks on "Show replies" button, the child comments of that comment will be loaded. [Basic UI done]+
+    ++ user's mini profile on video watch page.
+  + When a video is uploaded, try to generate the transcript and summary as well
+    ++ A dedicated AI server for generating transcript and summary from video's audio [DONE]
+    ++ Webapp BE server send request to create a request to the AI server, with the audio extracted from the just uploaded video.
+    ++ AI server after complete the job, try to add the video's transcript and summary into DB
+      +++ Option 1: Query directly from AI server
+      +++ Option 2: Send request back to webapp BE server to have it do this job.
+  + Page for user to manage personal profile
+    + Edit profile: avatar, name, liked video
+    + Personal video management: upload, edit video data (title, description, video, status), delete video
+  + Page for actor (guests and users) to report any problems
+    ++ Report errors
+    ++ Report inappropriate contents
+  + Page for admin to manage users
+  + Page for admin to manage videos
+  + Page for admin to manage reports
