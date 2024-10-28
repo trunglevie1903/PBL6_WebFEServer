@@ -83,7 +83,7 @@ const User_HomePage_ProfileSection: React.FC = () => {
       {isDropdownOpen && (
         <ul style={styles.dropdownMenu}>
           <li style={styles.dropdownItem}>
-            <a style={styles.dropdownItemText} href="/">Profile</a>
+            <a style={styles.dropdownItemText} href="/self">Profile</a>
           </li>
           <li style={styles.dropdownItem}>
             <a style={styles.dropdownItemText} href="/" onClick={handleSignOut}>Sign out</a>

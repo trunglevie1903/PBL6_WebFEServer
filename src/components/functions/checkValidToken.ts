@@ -45,6 +45,8 @@ const checkValidToken = async () => {
     } else {
       alert(`Error: ${error}`);
     }
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     return false;
   }
 };
