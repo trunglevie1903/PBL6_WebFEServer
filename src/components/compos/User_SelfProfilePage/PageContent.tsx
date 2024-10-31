@@ -6,6 +6,7 @@ import UpdateNameForm from './UpdateNameForm';
 import UpdateDescriptionForm from './UpdateDescriptionForm';
 import UpdateBannerImageForm from './UpdateBannerImageForm';
 import UpdateAvatarImageForm from './UpdateAvatarImageForm';
+import User_HomePage_Header from '../User_HomePage/User_HomePage_Header';
 
 // interface InputProp {
 //   userId: string;
@@ -57,24 +58,27 @@ const SelfProfilePageContent: React.FC = () => {
 
   return (
     <div style={styles.wrapper}>
-      <div>
+      <User_HomePage_Header />
+      {/* <div>
+      </div> */}
+      <div style={{width: "80%", margin: "0 auto", padding: "20px", display: "flex", flexDirection: "column", gap: "20px"}}>
         <h3>My Profile</h3>
-      </div>
-      <div>
-        {/* Component: UpdateBannerImageForm */}
-        {state_bannerImage && <UpdateBannerImageForm bannerImage={state_bannerImage} />}
-      </div>
-      <div>
-        {/* Component: UpdateAvatarImageForm */}
-        {state_avatarImage && <UpdateAvatarImageForm avatarImage={state_avatarImage} />}
-      </div>
-      <div>
-        {/* Component: UpdateNameForm */}
-        {(state_name && state_name !== "" && <UpdateNameForm name={state_name} />)}
-      </div>
-      <div>
-        {/* Component: UpdateDescriptionForm */}
-        <UpdateDescriptionForm description={state_description} />
+        <div>
+          {/* Component: UpdateBannerImageForm */}
+          {state_bannerImage && <UpdateBannerImageForm bannerImage={state_bannerImage} />}
+        </div>
+        <div>
+          {/* Component: UpdateAvatarImageForm */}
+          {state_avatarImage && <UpdateAvatarImageForm avatarImage={state_avatarImage} />}
+        </div>
+        <div>
+          {/* Component: UpdateNameForm */}
+          {(state_name && state_name !== "" && <UpdateNameForm name={state_name} />)}
+        </div>
+        <div>
+          {/* Component: UpdateDescriptionForm */}
+          <UpdateDescriptionForm description={state_description} />
+        </div>
       </div>
     </div>
   );
