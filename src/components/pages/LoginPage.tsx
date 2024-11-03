@@ -61,6 +61,11 @@ const LoginPage: React.FC = () => {
         <p style={styles.registerSection}>
           Don't have an account? <a href="/register" style={styles.a}>Register here</a>
         </p>
+        <p style={styles.registerSection}>
+          <a href="/forgot-password">
+            Forgot password?
+          </a>
+        </p>
       </div>
     </div>
   );

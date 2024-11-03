@@ -24,6 +24,7 @@ const User_HomePage_ContentSection: React.FC = () => {
       const response = await axios.get("http://127.0.0.1:4000/video/latest-ids");
       if (response.status === 200 && response.data.ids) {
         const ids: Array<string> = response.data.ids;
+        console.log(ids.length);
         // if (ids.length > 0) {
         //   const newIds: Array<string> = [];
         //   for (let i = 0; i < 6; ++i) {

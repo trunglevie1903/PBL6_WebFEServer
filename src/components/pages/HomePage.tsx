@@ -3,20 +3,31 @@ import React, { useState, useEffect } from 'react';
 import checkValidToken from '../functions/checkValidToken';
 import Guest_HomePage from './Guest_HomePage';
 import User_HomePage from './User_HomePage';
+import authenticateAdminUser from '../functions/authenticateAdminUser';
+import AdminHomePage from './Admin_HomePage';
 
 const HomePage: React.FC = () => {
   const [direction, setDirection] = useState("");
   
   useEffect(() => {
-    // console.log('useEffect triggered');
-    // Check accessToken and refreshToken in localStorage
+    const preloadFunction = async () => {
+      try {
+        const val = await checkValidToken();
+        if (!val) throw new Error("Unauthenticated");
+        const isAdminUser = await authenticateAdminUser();
+        setDirection(isAdminUser ? "admin" : "user");
+      } catch (error) {
+        console.error(error);
+        setDirection("guest");
+      };
+    };
 
-    checkValidToken().then((val) => setDirection(val ? "user" : "guest"));
-  }, []);
+    preloadFunction();
+  }, [direction]);
 
   return (
     <div>
-      {direction === "guest" ? <Guest_HomePage /> : direction === "user" ? <User_HomePage /> : <></>}
+      {direction === "admin" ? <AdminHomePage /> : direction === "user" ? <User_HomePage /> : direction === "guest" ? <Guest_HomePage /> : <></>}
     </div>
   );
 };

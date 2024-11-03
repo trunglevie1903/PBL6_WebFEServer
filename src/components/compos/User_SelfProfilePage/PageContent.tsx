@@ -6,7 +6,6 @@ import UpdateNameForm from './UpdateNameForm';
 import UpdateDescriptionForm from './UpdateDescriptionForm';
 import UpdateBannerImageForm from './UpdateBannerImageForm';
 import UpdateAvatarImageForm from './UpdateAvatarImageForm';
-import User_HomePage_Header from '../User_HomePage/User_HomePage_Header';
 
 // interface InputProp {
 //   userId: string;
@@ -31,6 +30,7 @@ const SelfProfilePageContent: React.FC = () => {
         });
 
         const profile = response.data.profile;
+        console.log("profile: ", profile);
         if (profile) {
           set_userId(profile.userId || "");
           set_name(profile.name || "");
@@ -49,19 +49,18 @@ const SelfProfilePageContent: React.FC = () => {
 
   const styles: {[key: string]: CSSProperties} = {
     wrapper: {
-      width: "100%",
+      width: "80%",
+      margin: "0 auto",
       display: "flex",
       flexDirection: "column",
       gap: "20px",
+      flex: 1, // Allow wrapper to take available space
     }
   }
 
   return (
     <div style={styles.wrapper}>
-      <User_HomePage_Header />
-      {/* <div>
-      </div> */}
-      <div style={{width: "80%", margin: "0 auto", padding: "20px", display: "flex", flexDirection: "column", gap: "20px"}}>
+      <div style={{padding: "20px", display: "flex", flexDirection: "column", gap: "20px"}}>
         <h3>My Profile</h3>
         <div>
           {/* Component: UpdateBannerImageForm */}

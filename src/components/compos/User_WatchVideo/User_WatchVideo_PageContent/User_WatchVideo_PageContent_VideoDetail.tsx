@@ -27,43 +27,75 @@ const User_WatchVideo_PageContent_VideoDetail: React.FC<VideoProp> = ({videoId})
   const [dislikeCount, setDislikeCount] = useState<number>(0);
 
   useEffect(() => {
+    const fetchProfile = async () => {
+      if (creatorUserId !== null && creatorUserId !== undefined && creatorUserId !== "") {
+        try {
+          const response = await axios.get(`http://127.0.0.1:4000/user/profile-mini-card/${creatorUserId}`);
+          if (axios.isAxiosError(response)) throw response;
+          const {profile} = response.data;
+          console.log('profile: ', profile);
+          if (!profile.username) throw new Error("Unexpected error when fetching video creator's data");
+          
+          setCreatorName(profile.username);
+          setAvatarSource(profile.avatarImage || "https://via.placeholder.com/150");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    fetchProfile();
+  }, [creatorUserId]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (videoId) {
+        try {
+          const response = await axios.get(`http://127.0.0.1:4000/video/get-transcript/${videoId}`);
+          if (axios.isAxiosError(response)) throw response;
+          console.log(response.data);
+          const {transcripts} = response.data;
+
+          setTranscript(transcripts);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    fetchProfile();
+  }, [videoId]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (videoId) {
+        try {
+          const response = await axios.get(`http://127.0.0.1:4000/video/get-summary/${videoId}`);
+          if (axios.isAxiosError(response)) throw response;
+          console.log(response.data);
+          const {summary} = response.data;
+
+          setSummary(summary.summary);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    fetchProfile();
+  }, [videoId]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         let response = await axios.get(`http://127.0.0.1:4000/video/get-video-detail/${videoId}`);
-        if (axios.isAxiosError(response) || response.status !== 200) throw response;
+        if (axios.isAxiosError(response)) throw response;
         const {video} = response.data;
         if (!video) throw new Error("Video not found");
-        // console.log("video: ", video);
-        if (!video.title || !video.creatorUserId || !video.description || !video.uploadDate) throw new Error("Unexpected error when fetching video data");
-
-        response = await axios.get(`http://127.0.0.1:4000/user/profile-mini-card/${video.creatorUserId}`);
-        if (axios.isAxiosError(response) || response.status !== 200) throw response;
-        const {profile} = response.data;
-        // console.log('profile: ', profile);
-        if (!profile.username) throw new Error("Unexpected error when fetching video creator's data");
-
-        response = await axios.get(`http://127.0.0.1:4000/video/get-transcript/${videoId}`);
-        if (axios.isAxiosError(response) || response.status !== 200) throw response;
-        console.log(response.data);
-        const {transcripts} = response.data;
-        // if (!transcripts) throw new Error("Unexpected error when fetching transcript and summary");
-        // console.log('transcript: ', transcripts);
-
-        response = await axios.get(`http://127.0.0.1:4000/video/get-summary/${videoId}`);
-        if (axios.isAxiosError(response) || response.status !== 200) throw response;
-        console.log(response.data.summary.summary);
-        const {summary} = response.data;
-        if (!summary) throw new Error("Unexpected error when fetching transcript and summary");
-
+        console.log("video: ", video);
+        if (!video.title || !video.creatorUserId || !video.uploadDate) throw new Error("Unexpected error when fetching video data");
         
         setTitle(video.title);
         setCreatorUserId(video.creatorUserId);
         setDescription(video.description);
         setUploadDate(video.uploadDate);
-        setTranscript(transcripts);
-        setSummary(summary.summary);
-        setCreatorName(profile.username);
-        setAvatarSource(profile.avatarImage || "https://via.placeholder.com/150");
       } catch (error) {
         if (axios.isAxiosError(error) && error.response && error.response.data && error.response.data.error) alert(`Error: ${error.response.data.error}`);
         else alert(`Error: ${error}`);

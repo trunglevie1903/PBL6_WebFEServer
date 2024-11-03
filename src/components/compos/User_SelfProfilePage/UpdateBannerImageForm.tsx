@@ -58,7 +58,6 @@ const UpdateBannerImageForm: React.FC<FormInputPropType> = ({ bannerImage }) => 
 
   const styles: { [key: string]: CSSProperties } = {
     wrapper: {
-      width: "100%",
       display: "flex",
       flexDirection: "column",
       alignItems: "left",

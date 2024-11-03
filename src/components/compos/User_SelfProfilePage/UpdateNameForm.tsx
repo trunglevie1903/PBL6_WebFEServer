@@ -51,7 +51,6 @@ const UpdateNameForm: React.FC<FormInputPropType> = ({name}) => {
 
   const styles: {[key: string]: CSSProperties} = {
     wrapper: {
-      width: "100%",
     },
     formTitle: {
 

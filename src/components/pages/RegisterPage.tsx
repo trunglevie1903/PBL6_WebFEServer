@@ -120,6 +120,11 @@ const RegisterPage: React.FC = () => {
         <p style={styles.loginSection}>
           Already have an account? <a href="/login" style={styles.a}>Login here</a>.
         </p>
+        <p style={styles.loginSection}>
+          <a href="/forgot-password">
+            Forgot password?
+          </a>
+        </p>
       </div>
     </div>
   );

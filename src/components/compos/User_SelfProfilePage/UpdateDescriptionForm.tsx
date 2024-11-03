@@ -51,7 +51,6 @@ const UpdateDescriptionForm: React.FC<FormInputPropType> = ({description}) => {
 
   const styles: {[key: string]: CSSProperties} = {
     wrapper: {
-      width: "100%",
     },
     formTitle: {
 
