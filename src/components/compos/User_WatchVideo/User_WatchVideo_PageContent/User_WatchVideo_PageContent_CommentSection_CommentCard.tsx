@@ -1,216 +1,206 @@
-import React, {CSSProperties, MouseEventHandler, useEffect, useState} from "react";
+import React, {MouseEventHandler, useEffect, useState} from "react";
 import axios from "axios";
-
-const getRandomInteger = (min: number, max: number) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-};
-// With input commentId, fetch the data of the comment having index of commentId (comment's content and writer)
-// With input userId of comment's writer, fetch the data of user profile: username and avatar image
-// With input commentId, fetch the data of this comment's child comments: count and index list
+import checkValidToken from "../../../functions/checkValidToken";
+import { jwtDecode, JwtPayload } from "jwt-decode";
+import ReplyCommentForm from "./ReplyCommentForm";
+import UpdateCommentForm from "./UpdateCommentForm";
+import DeleteCommentForm from "./DeleteCommentForm";
 
 interface InputProp {
   commentId: string;
-  hasChildComments: boolean;
 }
 
-interface CommentInterface {
-  commentId: string;
-  userId: string;
-  videoId: string;
-  parentCommentId: string | null;
-  content: string;
-  createdAt: string;
-}
+const User_WatchVideo_PageContent_CommentSection_CommentCard: React.FC<InputProp> = ({commentId}) => {
+  const [userId, set_userId] = useState<string>("");
+  const [content, set_content] = useState<string>("");
+  const [createdTime, set_createdTime] = useState<string>("");
+  const [username, set_username] = useState<string>("");
+  const [avatarSource, set_avatarSource] = useState<string>("");
+  const [isParent, set_isParent] = useState<boolean>(false);
+  const [toShowChildComment, set_toShowChildComment] = useState<boolean>(false);
+  const [childCommentIds, set_childCommentIds] = useState<string[]>([]);
+  const [isWrittenByClient, set_isWrittenByClient] = useState<boolean>(false);
+  const [videoId, set_videoId] = useState<string>("");
+  const [toShowReplyForm, set_toShowReplyForm] = useState<boolean>(false);
+  const [isUpdateModalVisible, set_isUpdateModalVisible] = useState<boolean>(false);
+  const [isDeleteModalVisible, set_isDeleteModalVisible] = useState<boolean>(false);
 
-const User_WatchVideo_PageContent_CommentSection_CommentCard: React.FC<InputProp> = ({commentId, hasChildComments}) => {
-  const [isReplyFormShow, setReplyFormShow] = useState<boolean>(false);
-  const [hasChild, setHasChild] = useState<boolean>(hasChildComments);
-  const [isReplyCommentsShow, setReplyCommentsShow] = useState<boolean>(false);
-  const [childCommentsList, setChildCommentList] = useState();
-
-  // const [comment, setComment] = useState<CommentInterface>();
-  const [username, setUsername] = useState<string>("User");
-  const [avatarImageSource, setAvatarImageSource] = useState<string>("https://placehold.co/40");
-  
-  const [userId, setUserId] = useState("");
-  const [videoId, setVideoId] = useState("");
-  const [parentCommentId, setParentCommentId] = useState("");
-  const [content, setContent] = useState("");
-  const [createdAt, setCreatedAt] = useState(new Date().toLocaleString());
-
-  // Request to get comment's data
+  // load comment information
   useEffect(() => {
-    const fetchComment = async () => {
+    const fetchCommentData = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:4000/comments/get-comment-content/${commentId}`);
-        if (axios.isAxiosError(response) || response.status !== 200) throw response;
-        console.log('response data: ', response.data);
-        if ('comment' in response.data) {
-          const commentData: CommentInterface = response.data.comment;
-          setUserId(commentData.userId);
-          setVideoId(commentData.videoId);
-          setParentCommentId(commentData.parentCommentId);
-          setContent(commentData.content);
-          setCreatedAt(commentData.createdAt);
+        if (commentId) {
+          const response = await axios.get(`http://127.0.0.1:4000/comment/id/${commentId}`);
+          if (response.data && response.data.comment) {
+            set_userId(response.data.comment.userId);
+            set_content(response.data.comment.content);
+            set_createdTime(response.data.comment.createdTime);
+            set_videoId(response.data.comment.videoId);
+          }
         }
       } catch (error) {
-        alert(`Error: ${error}`);
+        console.error(error);
       }
     };
-    fetchComment();
+    fetchCommentData();
   }, [commentId]);
 
+  // load information of user who wrote this comment
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setUsername("Username");
-        setAvatarImageSource("https://placehold.co/40");
-      } catch (error) {
-        alert(`Error: ${error}`);
-      } 
+    const fetchUserInfo = async () => {
+      if (userId) {
+        try {
+          const response = await axios.get(`http://127.0.0.1:4000/user/profile-mini-card/${userId}`)
+          if (response.data && response.data.profile) {
+            set_username(response.data.profile.username);
+            set_avatarSource(response.data.profile.avatarImage);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
     };
-    fetchUser();
+    fetchUserInfo();
   }, [userId]);
 
-  const handleClickShowReplyForm: MouseEventHandler = (event) => {
-    event.preventDefault();
-    setReplyFormShow(!isReplyFormShow);
+  // check if this comment is a parent comment
+  useEffect(() => {
+    const checkIsParentComment = async () => {
+      try {
+        if (commentId) {
+          const response = await axios.get(`http://127.0.0.1:4000/comment/is-parent/${commentId}`);
+          if (response.data && response.data.message) {
+            // console.log(response.data);
+            // console.log(response.data.message === "Yes");
+            set_isParent(response.data.message === "Yes");
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    checkIsParentComment();
+  }, [commentId]);
+
+  // load child comments
+  useEffect(() => {
+    const findChildCommentIds = async () => {
+      if (commentId && isParent) {
+        try {
+          const response = await axios.get(`http://127.0.0.1:4000/comment/find-child-comment/${commentId}`);
+          if (response.data && response.data.ids) {
+            set_childCommentIds(response.data.ids);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    findChildCommentIds()
+  }, [commentId, isParent]);
+
+  // check is client wrote this comment, then show the update and delete button
+  useEffect(() => {
+    const checkIfClientWroteThisComment = async () => {
+      if (username && await checkValidToken()) {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (accessToken) {
+            const payload = jwtDecode(accessToken) as JwtPayload;
+            if ("username" in payload && payload.username === username) {
+              return set_isWrittenByClient(true);
+            }
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      set_isWrittenByClient(false);
+    };
+    checkIfClientWroteThisComment();
+  }, [username]);
+
+  // button to set if child comments is shown or not
+  const onClickShowChildComment: MouseEventHandler = (e) => {
+    e.preventDefault();
+    // console.log(`Change show child comment to ${!toShowChildComment}`);
+    set_toShowChildComment(!toShowChildComment);
   };
 
-  const handleClickShowReplyComments: MouseEventHandler = (event) => {
-    event.preventDefault();
-    setReplyCommentsShow(!isReplyCommentsShow);
+  // handle click on button to show update comment form
+  const onClickUpdateComment: MouseEventHandler = (e) => {
+    e.preventDefault();
+    set_isUpdateModalVisible(true);
+  };
+  // handle click to close update comment modal
+  const onClickCloseUpdateComment: MouseEventHandler = (e) => {
+    e.preventDefault();
+    set_isUpdateModalVisible(false);
   };
 
-  const styles: {[key: string]: CSSProperties} = {
-    commentCard: {
-      display: "flex",
-      marginBottom: "15px",
-      gap: "10px",
-    },
-    commentAvatar: {
-      // marginRight: "10px"
-    },
-    commentAvatar_image: {
-      width: "40px",
-      height: "40px",
-      borderRadius: "50%",
-    },
-    commentContent: {
-      flex: 1,
-    },
-    commentHeader: {
-      display: "flex",
-      alignItems: "center",
-      marginBottom: "5px",
-      gap: "15px"
-    },
-    commentUsername: {},
-    commentTime: {
-      color: "gray",
-      fontSize: "12px",
-    },
-    commentText: {
-      marginBottom: "10px"
-    },
-    commentAction: {
-      position: "relative",
-    },
-    replyButton: {
-      background: "none",
-      border: "none",
-      color: "blue",
-      cursor: "pointer",
-      padding: 0,
-      fontSize: "14px",
-    },
-    replyForm: {
-      display: isReplyFormShow ? "block" : "none",
-      marginTop: "10px",
-    },
-    replyForm_textarea: {
-      width: "100%",
-      height: "60px",
-      marginBottom: "5px",
-      padding: "5px",
-    },
-    replyForm_button: {
-      padding: "5px 10px",
-      backgroundColor: "blue",
-      color: "white",
-      border: "none",
-      cursor: "pointer",
-    },
-    showReplies: {
-      display: hasChild ? "block" : "none",
-      marginTop: "10px",
-    },
-    showReplies_button: {
-      display: "block",
-      background: "none",
-      border: "none",
-      color: "blue",
-      cursor: "pointer",
-      padding: 0,
-      fontSize: "14px",
-    },
-    childComments: {
-      display: isReplyCommentsShow ? "block" : "none",
-      marginTop: "10px",
-      paddingLeft: "20px",
-    }
+  // handle click on button to show update comment form
+  const onClickDeleteCommentModal: MouseEventHandler = (e) => {
+    e.preventDefault();
+    set_isDeleteModalVisible(true);
   };
+  // handle click to close update comment modal
+  const onClickCloseDeleteCommentModal: MouseEventHandler = (e) => {
+    e.preventDefault();
+    set_isDeleteModalVisible(false);
+  };
+
+  // handle click on reply button
+  const onClickReplyComment: MouseEventHandler = (e) => {
+    e.preventDefault();
+    set_toShowReplyForm(!toShowReplyForm);
+  };
+  
   return (
-    <>
-      {/* <h3>Comments</h3> */}
-      <div className="comment-card" style={styles.commentCard}>
-        {/* <!-- Left part: Avatar --> */}
-        <div className="comment-avatar" style={styles.commentAvatar}>
-          <img alt="User Avatar" srcSet={avatarImageSource} style={styles.commentAvatar_image} />
-        </div>
-        
-        {/* <!-- Right part: Text Content --> */}
-        <div className="comment-content"  style={styles.commentContent}>
-          {/* <!-- First row: Username and time --> */}
-          <div className="comment-header" style={styles.commentHeader}>
-            <strong className="comment-username" style={styles.commentUsername}>
-              {/* {username} */}
-              Username
-            </strong>
-            <span className="comment-time" style={styles.commentTime}>
-              {createdAt}
-              {/* Wrote at: 00/00/0000 00:00:00 */}
-            </span>
-          </div>
-
-          {/* <!-- Second row: Comment text --> */}
-          <div className="comment-text" style={styles.commentText}>
-            {content}
-            {/* Comment content */}
-          </div>
-
-          {/* <!-- Third row: Reply button --> */}
-          <div className="comment-actions" style={styles.commentAction}>
-            <button className="reply-btn" style={styles.replyButton} onClick={handleClickShowReplyForm}>Reply</button>
-            <div className="reply-form" style={styles.replyForm}>
-              <textarea placeholder="Write a reply..." style={styles.replyForm_textarea}></textarea>
-              <button style={styles.replyForm_button}>Post Reply</button>
-            </div>
-          </div>
-
-          {/* <!-- Fourth row: Show replies button --> */}
-          <div className="show-replies" style={styles.showReplies}>
-            <button className="show-replies-btn" style={styles.showReplies_button} onClick={handleClickShowReplyComments} >Show replies</button>
-            <div className="child-comments" style={styles.childComments}>
-              {/* <!-- Child comments will go here --> */}
-            </div>
-          </div>
-        </div>
+    <div style={{padding: "10px", display: "flex", flexDirection: "row", gap: "10px"}}>
+      <div>
+        <img style={{width: "40px", height: "40px", borderRadius: "50%"}} src={avatarSource} alt="avatar" />
       </div>
-
-    </>
+      <div style={{display: "flex", flexDirection: "column", width: "100%"}}>
+        <p style={{padding: "5px"}}>
+          <span style={{fontWeight: "bold"}}>{username}</span>&nbsp;<span style={{fontSize: "0.7em"}}>{createdTime}</span>
+        </p>
+        <p style={{padding: "5px"}}>{content}</p>
+        <div style={{padding: "5px", display: "flex", flexDirection: "row", justifyContent: "flex-start", gap: "5px"}}>
+          <button style={{padding: "5px"}} onClick={onClickReplyComment}>Reply</button>
+          {
+            isWrittenByClient && 
+            <button style={{padding: "5px"}} onClick={onClickUpdateComment}>Update</button>
+          }
+          {
+            isWrittenByClient && 
+            <button style={{padding: "5px"}} onClick={onClickDeleteCommentModal}>Delete</button>
+          }
+        </div>
+        {
+          toShowReplyForm && 
+          <ReplyCommentForm videoId={videoId} parentCommentId={commentId}/>
+        }
+        {
+          isParent && 
+          <div style={{padding: "5px"}}>
+            <button style={{padding: "5px"}} onClick={onClickShowChildComment}>Show replies</button>
+            {
+              toShowChildComment && 
+              <div style={{}}>
+                {childCommentIds.map(item => <User_WatchVideo_PageContent_CommentSection_CommentCard key={item} commentId={item} />)}
+              </div>
+            }
+          </div>
+        }
+      </div>
+      {
+        isUpdateModalVisible &&
+        <UpdateCommentForm commentId={commentId} content={content} closeModal={onClickCloseUpdateComment}/>
+      }{
+        isDeleteModalVisible &&
+        <DeleteCommentForm commentId={commentId} closeModal={onClickCloseDeleteCommentModal}/>
+      }
+    </div>
   )
 };
 

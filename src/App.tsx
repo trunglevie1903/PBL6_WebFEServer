@@ -13,6 +13,7 @@ import UserSelfProfile from "./components/pages/UserSelfProfile";
 import UserProfilePage from "./components/pages/Guest_UserProfilePage";
 import ForgotPasswordPage from "./components/pages/ForgotPassword";
 import ResetPasswordPage from "./components/pages/ResetPasswordPage";
+import SearchResult_Page from "./components/pages/SearchResult_Page";
 
 const App: React.FC = () => {
   return (
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         <Route path="/user/:userId" element={<UserProfilePage />}></Route>
         <Route path="/forgot-password" element={<ForgotPasswordPage />}></Route>
         <Route path="/reset-password" element={<ResetPasswordPage />}></Route>
+        {/* <Route path="/search-result/:searchText" element={<SearchResult_Page />}></Route> */}
         {/* <Route path="/dummy" element={<Dummy />} /> */}
         {/* <Route path="/customize_profile" element={<CustomizeProfilePage />} /> */}
         {/* <Route path="/c/:userId" element={<UserChannel />} /> */}

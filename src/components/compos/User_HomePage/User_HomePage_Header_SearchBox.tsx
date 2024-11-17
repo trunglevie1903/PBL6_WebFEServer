@@ -1,6 +1,15 @@
-import React, {CSSProperties} from "react";
+import React, {CSSProperties, useState} from "react";
+import { useNavigate } from "react-router-dom";
 
 const User_HomePage_Header_SearchBox: React.FC = () => {
+  const [searchText, set_searchText] = useState<string>("");
+  const navigate = useNavigate();
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(`/search-result/${searchText}`);
+  };
+
   const styles: {[key: string]:CSSProperties} = {
     input: {
       width: "100%",
@@ -25,10 +34,10 @@ const User_HomePage_Header_SearchBox: React.FC = () => {
     }
   }
   return (
-    <div style={styles.wrapper}>
-      <input type="text" placeholder="Search..." style={styles.input} />
-      <button style={styles.button}>Search</button>
-    </div>
+    <form onSubmit={onSubmit} style={styles.wrapper}>
+      <input type="text" placeholder="Search..." style={styles.input} onChange={(e) => set_searchText(e.target.value)} />
+      <button type="submit" style={styles.button}>Search</button>
+    </form>
   );
 };
 

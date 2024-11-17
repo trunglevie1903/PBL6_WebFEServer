@@ -48,7 +48,7 @@ const User_WatchVideo_PageContent: React.FC<VideoProp> = ({videoId}) => {
           <User_WatchVideo_PageContent_VideoDetail videoId={videoId} />
         </div>
         <div className="commentSection">
-          {/* <User_WatchVideo_PageContent_CommentSection videoId={videoId} /> */}
+          <User_WatchVideo_PageContent_CommentSection videoId={videoId} />
         </div>
       </div>
       <div className="rightColumn" style={styles.rightColumn}>
