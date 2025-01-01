@@ -41,9 +41,9 @@ const checkValidToken = async () => {
   } catch (error) {
     console.log('checkValidToken error: ', error);
     if (axios.isAxiosError(error) && error.response) {
-      alert(`Error: ${error.response?.data.message || error}`);
+      // alert(`Error: ${error.response?.data.message || error}`);
     } else {
-      alert(`Error: ${error}`);
+      // alert(`Error: ${error}`);
     }
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');

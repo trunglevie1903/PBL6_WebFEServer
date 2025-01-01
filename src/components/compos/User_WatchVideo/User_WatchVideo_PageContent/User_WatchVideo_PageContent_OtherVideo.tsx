@@ -26,14 +26,15 @@ const User_WatchVideo_PageContent_OtherVideo: React.FC<VideoProp> = ({videoId}) 
     fetchData();
   }, []);
 
-  return (
-    <>
+  if (ids.length > 0) return (
+    <div style={{}}>
       <h3 style={{marginBottom: "10px"}}>Other videos</h3>
       <div>
         {ids.map(id => <User_WatchVideo_PageContent_OtherVideo_VideoCard videoId={id} key={id} />)}
       </div>
-    </>
+    </div>
   );
+  else return (<></>);
 };
 
 export default User_WatchVideo_PageContent_OtherVideo;
